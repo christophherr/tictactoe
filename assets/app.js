@@ -11,27 +11,40 @@ var playerSymbol = '',
     computerSymbol = '',
     // Outputs the API response to the board.
     computerMoveField,
+    // Create the ID for outputting the Computer move.
+    computerMove,
+    // Player plays 'O'
+    playerPlaysO = function() {
+        playerSymbol = 'O';
+        computerSymbol = 'X';
+        startGame();
+    },
+    playerPlaysX = function() {
+        playerSymbol = 'X';
+        computerSymbol = 'O';
+        startGame();
+    },
     // Base URL parameter pattern recording the moves.
     urlParameters = ['-', '-', '-', '-', '-', '-', '-', '-', '-'],
     // URL parameter for API request.
     strippedUrlParameters,
+    // Api Url
+    tictactoeapiUrl,
     // Keep track of moves.
     moves = 0,
     // Selection of Game fields
-    gameFields = document.getElementsByClassName('tic-tac-toe-field');
+    gameFields = document.getElementsByClassName('tic-tac-toe-field'),
+    // Clicked Game fields
+    playerMove = document.getElementById('tic-tac-toe-board');
 
 // Setup game depending on Player's symbol choice
-document.getElementById('playerO').onclick = function() {
-    playerSymbol = 'O';
-    computerSymbol = 'X';
-    startGame();
-};
+document.getElementById('playerO').onclick = playerPlaysO;
 
-document.getElementById('playerX').onclick = function() {
-    playerSymbol = 'X';
-    computerSymbol = 'O';
-    startGame();
-};
+document.getElementById('playerX').onclick = playerPlaysX;
+
+playerMove.addEventListener('click', function(event) {
+    addMove(event.target.id);
+});
 
 // Start with a fresh board, count and URL parameter.
 function startGame() {
@@ -43,11 +56,10 @@ function startGame() {
     urlParameters = ['-', '-', '-', '-', '-', '-', '-', '-', '-'];
 }
 
-// Additional resets to re-start the game without reload.
+// Additional resets to prevent input if modals are dismissed.
 function resetGame() {
     playerSymbol = '';
     computerSymbol = '';
-    // startGame();
 }
 
 // Winning logic.
@@ -78,22 +90,44 @@ function checkWinner(symbol) {
             $('#5').hasClass(symbol) &&
             $('#8').hasClass(symbol))
     ) {
-        $('.tic-tac-toe-field').off();
-
         if (symbol === playerSymbol) {
-            swal(
-                'Congratulations. You won!',
-                'Please select a symbol to start a new game.',
-                'success'
+            swal({
+                title: 'Congratulations. You won!',
+                text: 'Please select a symbol to start a new game.',
+                type: 'success',
+                showCancelButton: true,
+                confirmButtonText: "Click here to play 'O'",
+                cancelButtonText: "Click here to play 'X'"
+            }).then(
+                function() {
+                    playerPlaysO();
+                },
+                function(dismiss) {
+                    if (dismiss === 'cancel') {
+                        playerPlaysX();
+                    }
+                }
             );
             resetGame();
         }
 
         if (symbol === computerSymbol) {
-            swal(
-                'Oh no... The computer won...',
-                'Please select a symbol to start a new game.',
-                'error'
+            swal({
+                title: 'Oh no... The computer won...',
+                text: 'Please select a symbol to start a new game.',
+                type: 'error',
+                showCancelButton: true,
+                confirmButtonText: "Click here to play 'O'",
+                cancelButtonText: "Click here to play 'X'"
+            }).then(
+                function() {
+                    playerPlaysO();
+                },
+                function(dismiss) {
+                    if (dismiss === 'cancel') {
+                        playerPlaysX();
+                    }
+                }
             );
             resetGame();
         }
@@ -105,10 +139,22 @@ function draw() {
     if (moves === 9) {
         setTimeout(
             function() {
-                swal(
-                    "It's a draw. Nobody wins.",
-                    'Please select a symbol to start a new game.',
-                    'info'
+                swal({
+                    title: "It's a draw. Nobody wins",
+                    text: 'Please select a sympbol to start a new game.',
+                    type: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: "Click here to play 'O'",
+                    cancelButtonText: "Click here to play 'X'"
+                }).then(
+                    function() {
+                        playerPlaysO();
+                    },
+                    function(dismiss) {
+                        if (dismiss === 'cancel') {
+                            playerPlaysX();
+                        }
+                    }
                 );
                 resetGame();
             },
@@ -123,16 +169,28 @@ function addMove(id) {
     if (!playerSymbol) {
         return swal({
             title: 'Please choose a symbol to start playing.',
-            type: 'error'
-        });
+            type: 'error',
+            showCancelButton: true,
+            confirmButtonText: "Click here to play 'O'",
+            cancelButtonText: "Click here to play 'X'"
+        }).then(
+            function() {
+                playerPlaysO();
+            },
+            function(dismiss) {
+                if (dismiss === 'cancel') {
+                    playerPlaysX();
+                }
+            }
+        );
     }
 
-    // Create an ID from the click event.
-    var field = '#' + id;
+    // Select HTML element from click event.
+    var selectField = document.getElementById(id);
 
     // Make sure the field is empty,
     // prevent accidentally clicking the same field twice.
-    if ($(field).html().length > 0) {
+    if (selectField.innerHTML.length > 0) {
         return swal(
             'This field has already been played.',
             'Please select a different field.',
@@ -141,7 +199,8 @@ function addMove(id) {
     }
 
     // Output Player's turn and class on the board.
-    $(field).html(playerSymbol).addClass(playerSymbol);
+    selectField.classList.add(playerSymbol);
+    selectField.innerHTML = playerSymbol;
 
     // Check if Player has won.
     setTimeout(
@@ -157,11 +216,6 @@ function addMove(id) {
     // Check if it´s a draw.
     draw();
 
-    // Prevent API call after draw.
-    if (!computerSymbol) {
-        return null;
-    }
-
     // Player's move is recorded in the URL parameter.
     urlParameters[id] = playerSymbol;
 
@@ -169,33 +223,33 @@ function addMove(id) {
     strippedUrlParameters = urlParameters.toString().replace(/,/g, '');
 
     // Create the URL for API call.
-    var tictactoeapiUrl = 'https://tttapi.herokuapp.com/api/v1/' +
+    tictactoeapiUrl = 'https://tttapi.herokuapp.com/api/v1/' +
         strippedUrlParameters +
         '/' +
         computerSymbol;
 
-    // Make the API call and turn the response into the Computer move.
-    $.getJSON(tictactoeapiUrl, function(data) {
-        // Retrieve Computer move.
-        computerMoveField = data.recommendation;
+    if (moves < 9) {
+        // Make the API call and turn the response into the Computer move.
+        $.getJSON(tictactoeapiUrl, function(data) {
+            // Retrieve Computer move.
+            computerMoveField = data.recommendation;
 
-        // Create the ID for outputting the Computer move.
-        var computerMove = '#' + computerMoveField;
+            computerMove = document.getElementById(computerMoveField);
+            computerMove.innerHTML = computerSymbol;
+            computerMove.classList.add(computerSymbol);
 
-        // Output the Computer move and class to the board.
-        $(computerMove).html(computerSymbol).addClass(computerSymbol);
+            moves++;
 
-        moves++;
+            // Update the URL parameter with the Computer move.
+            urlParameters[computerMoveField] = computerSymbol;
 
-        // Update the URL parameter with the Computer move.
-        urlParameters[computerMoveField] = computerSymbol;
-
-        // Check if Computer has won.
-        setTimeout(
-            function() {
-                checkWinner(computerSymbol);
-            },
-            200
-        );
-    });
+            // Check if Computer has won.
+            setTimeout(
+                function() {
+                    checkWinner(computerSymbol);
+                },
+                200
+            );
+        });
+    }
 }

@@ -1,5 +1,4 @@
-/* global $*/
-/* global swal*/
+/* global $, swal, axios*/
 // Uses Stujo's Tic Tac Toe API for Computer moves.
 // https://github.com/stujo/tictactoe-api
 
@@ -230,9 +229,10 @@ function addMove(id) {
 
     if (moves < 9) {
         // Make the API call and turn the response into the Computer move.
-        $.getJSON(tictactoeapiUrl, function(data) {
+        // $.getJSON(tictactoeapiUrl, function(data) {
+        axios.get(tictactoeapiUrl).then(function(response) {
             // Retrieve Computer move.
-            computerMoveField = data.recommendation;
+            computerMoveField = response.data.recommendation;
 
             computerMove = document.getElementById(computerMoveField);
             computerMove.innerHTML = computerSymbol;

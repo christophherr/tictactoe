@@ -1,26 +1,24 @@
 /* global $*/
+/* global swal*/
 // Uses Stujo's Tic Tac Toe API for Computer moves.
 // https://github.com/stujo/tictactoe-api
 
 'use strict';
 
 // Symbol the player plays.
-var playerSymbol = '';
-
-// Symbol the computer plays.
-var computerSymbol = '';
-
-// Outputs the API response to the board.
-var computerMoveField;
-
-// Base URL parameter pattern recording the moves.
-var urlParameters = ['-', '-', '-', '-', '-', '-', '-', '-', '-'];
-
-// URL parameter for API request.
-var strippedUrlParameters;
-
-// Keep track of moves.
-var moves = 0;
+var playerSymbol = '',
+    // Symbol the computer plays.
+    computerSymbol = '',
+    // Outputs the API response to the board.
+    computerMoveField,
+    // Base URL parameter pattern recording the moves.
+    urlParameters = ['-', '-', '-', '-', '-', '-', '-', '-', '-'],
+    // URL parameter for API request.
+    strippedUrlParameters,
+    // Keep track of moves.
+    moves = 0,
+    // Selection of Game fields
+    gameFields = document.getElementsByClassName('tic-tac-toe-field');
 
 // Setup game depending on Player's symbol choice
 document.getElementById('playerO').onclick = function() {
@@ -35,10 +33,12 @@ document.getElementById('playerX').onclick = function() {
     startGame();
 };
 
-
 // Start with a fresh board, count and URL parameter.
 function startGame() {
-    $('.tic-tac-toe-field').empty();
+    for (var i = 0; i < gameFields.length; i++) {
+        gameFields[i].classList.remove('O', 'X');
+        gameFields[i].innerHTML = '';
+    }
     moves = 0;
     urlParameters = ['-', '-', '-', '-', '-', '-', '-', '-', '-'];
 }
@@ -47,20 +47,37 @@ function startGame() {
 function resetGame() {
     playerSymbol = '';
     computerSymbol = '';
-    $('.tic-tac-toe-field').removeClass('O X');
-    startGame();
+    // startGame();
 }
 
 // Winning logic.
 function checkWinner(symbol) {
-    if ($('#0').hasClass(symbol) && $('#1').hasClass(symbol) && $('#2').hasClass(symbol) ||
-        $('#3').hasClass(symbol) && $('#4').hasClass(symbol) && $('#5').hasClass(symbol) ||
-        $('#6').hasClass(symbol) && $('#7').hasClass(symbol) && $('#8').hasClass(symbol) ||
-        $('#0').hasClass(symbol) && $('#4').hasClass(symbol) && $('#8').hasClass(symbol) ||
-        $('#2').hasClass(symbol) && $('#4').hasClass(symbol) && $('#6').hasClass(symbol) ||
-        $('#0').hasClass(symbol) && $('#3').hasClass(symbol) && $('#6').hasClass(symbol) ||
-        $('#1').hasClass(symbol) && $('#4').hasClass(symbol) && $('#7').hasClass(symbol) ||
-        $('#2').hasClass(symbol) && $('#5').hasClass(symbol) && $('#8').hasClass(symbol)) {
+    if (
+        ($('#0').hasClass(symbol) &&
+            $('#1').hasClass(symbol) &&
+            $('#2').hasClass(symbol)) ||
+        ($('#3').hasClass(symbol) &&
+            $('#4').hasClass(symbol) &&
+            $('#5').hasClass(symbol)) ||
+        ($('#6').hasClass(symbol) &&
+            $('#7').hasClass(symbol) &&
+            $('#8').hasClass(symbol)) ||
+        ($('#0').hasClass(symbol) &&
+            $('#4').hasClass(symbol) &&
+            $('#8').hasClass(symbol)) ||
+        ($('#2').hasClass(symbol) &&
+            $('#4').hasClass(symbol) &&
+            $('#6').hasClass(symbol)) ||
+        ($('#0').hasClass(symbol) &&
+            $('#3').hasClass(symbol) &&
+            $('#6').hasClass(symbol)) ||
+        ($('#1').hasClass(symbol) &&
+            $('#4').hasClass(symbol) &&
+            $('#7').hasClass(symbol)) ||
+        ($('#2').hasClass(symbol) &&
+            $('#5').hasClass(symbol) &&
+            $('#8').hasClass(symbol))
+    ) {
         $('.tic-tac-toe-field').off();
 
         if (symbol === playerSymbol) {
@@ -86,19 +103,22 @@ function checkWinner(symbol) {
 // Check for a draw.
 function draw() {
     if (moves === 9) {
-        setTimeout(function() {
-            swal(
-                "It's a draw. Nobody wins.",
-                'Please select a symbol to start a new game.',
-                'info');
-            resetGame();
-        }, 200);
+        setTimeout(
+            function() {
+                swal(
+                    "It's a draw. Nobody wins.",
+                    'Please select a symbol to start a new game.',
+                    'info'
+                );
+                resetGame();
+            },
+            200
+        );
     }
 }
 
 // Game logic.
 function addMove(id) {
-
     // Make sure the Player has chosen a symbol.
     if (!playerSymbol) {
         return swal({
@@ -116,17 +136,20 @@ function addMove(id) {
         return swal(
             'This field has already been played.',
             'Please select a different field.',
-            'error');
+            'error'
+        );
     }
 
     // Output Player's turn and class on the board.
     $(field).html(playerSymbol).addClass(playerSymbol);
 
     // Check if Player has won.
-    setTimeout(function() {
-        checkWinner(playerSymbol);
-    }, 200);
-
+    setTimeout(
+        function() {
+            checkWinner(playerSymbol);
+        },
+        200
+    );
 
     // Increment moves.
     moves++;
@@ -140,17 +163,19 @@ function addMove(id) {
     }
 
     // Player's move is recorded in the URL parameter.
-    urlParameters[id] = (playerSymbol);
+    urlParameters[id] = playerSymbol;
 
     // URL parameter is prepared for API call
     strippedUrlParameters = urlParameters.toString().replace(/,/g, '');
 
     // Create the URL for API call.
-    var tictactoeapiUrl = 'https://tttapi.herokuapp.com/api/v1/' + strippedUrlParameters + '/' + computerSymbol;
+    var tictactoeapiUrl = 'https://tttapi.herokuapp.com/api/v1/' +
+        strippedUrlParameters +
+        '/' +
+        computerSymbol;
 
     // Make the API call and turn the response into the Computer move.
     $.getJSON(tictactoeapiUrl, function(data) {
-
         // Retrieve Computer move.
         computerMoveField = data.recommendation;
 
@@ -163,12 +188,14 @@ function addMove(id) {
         moves++;
 
         // Update the URL parameter with the Computer move.
-        urlParameters[computerMoveField] = (computerSymbol);
+        urlParameters[computerMoveField] = computerSymbol;
 
         // Check if Computer has won.
-        setTimeout(function() {
-            checkWinner(computerSymbol);
-        }, 200);
-
+        setTimeout(
+            function() {
+                checkWinner(computerSymbol);
+            },
+            200
+        );
     });
 }

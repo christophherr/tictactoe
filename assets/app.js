@@ -43,7 +43,17 @@ var playerSymbol = '',
     addMove,
     // Winning Logic
     checkWinner,
-    draw;
+    draw,
+    // input fields for checkWinner
+    field0 = document.getElementById('0'),
+    field1 = document.getElementById('1'),
+    field2 = document.getElementById('2'),
+    field3 = document.getElementById('3'),
+    field4 = document.getElementById('4'),
+    field5 = document.getElementById('5'),
+    field6 = document.getElementById('6'),
+    field7 = document.getElementById('7'),
+    field8 = document.getElementById('8');
 
 // Setup game depending on Player's symbol choice
 document.getElementById('playerO').onclick = playerPlaysO;
@@ -73,30 +83,30 @@ resetGame = function() {
 // Winning logic.
 checkWinner = function(symbol) {
     if (
-        (document.getElementById('0').classList.contains(symbol) &&
-            document.getElementById('1').classList.contains(symbol) &&
-            document.getElementById('2').classList.contains(symbol)) ||
-        ($('#3').hasClass(symbol) &&
-            $('#4').hasClass(symbol) &&
-            $('#5').hasClass(symbol)) ||
-        ($('#6').hasClass(symbol) &&
-            $('#7').hasClass(symbol) &&
-            $('#8').hasClass(symbol)) ||
-        ($('#0').hasClass(symbol) &&
-            $('#4').hasClass(symbol) &&
-            $('#8').hasClass(symbol)) ||
-        ($('#2').hasClass(symbol) &&
-            $('#4').hasClass(symbol) &&
-            $('#6').hasClass(symbol)) ||
-        ($('#0').hasClass(symbol) &&
-            $('#3').hasClass(symbol) &&
-            $('#6').hasClass(symbol)) ||
-        ($('#1').hasClass(symbol) &&
-            $('#4').hasClass(symbol) &&
-            $('#7').hasClass(symbol)) ||
-        ($('#2').hasClass(symbol) &&
-            $('#5').hasClass(symbol) &&
-            $('#8').hasClass(symbol))
+        (field0.classList.contains(symbol) &&
+            field1.classList.contains(symbol) &&
+            field2.classList.contains(symbol)) ||
+        (field3.classList.contains(symbol) &&
+            field4.classList.contains(symbol) &&
+            field5.classList.contains(symbol)) ||
+        (field6.classList.contains(symbol) &&
+            field7.classList.contains(symbol) &&
+            field8.classList.contains(symbol)) ||
+        (field0.classList.contains(symbol) &&
+            field4.classList.contains(symbol) &&
+            field8.classList.contains(symbol)) ||
+        (field2.classList.contains(symbol) &&
+            field4.classList.contains(symbol) &&
+            field6.classList.contains(symbol)) ||
+        (field0.classList.contains(symbol) &&
+            field3.classList.contains(symbol) &&
+            field6.classList.contains(symbol)) ||
+        (field1.classList.contains(symbol) &&
+            field4.classList.contains(symbol) &&
+            field7.classList.contains(symbol)) ||
+        (field2.classList.contains(symbol) &&
+            field5.classList.contains(symbol) &&
+            field8.classList.contains(symbol))
     ) {
         if (symbol === playerSymbol) {
             swal({

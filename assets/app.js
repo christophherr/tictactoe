@@ -18,6 +18,7 @@ var playerSymbol = '',
         computerSymbol = 'X';
         startGame();
     },
+    // Player plays 'X'
     playerPlaysX = function() {
         playerSymbol = 'X';
         computerSymbol = 'O';
@@ -34,7 +35,15 @@ var playerSymbol = '',
     // Selection of Game fields
     gameFields = document.getElementsByClassName('tic-tac-toe-field'),
     // Clicked Game fields
-    playerMove = document.getElementById('tic-tac-toe-board');
+    playerMove = document.getElementById('tic-tac-toe-board'),
+    // Game helpers
+    startGame,
+    resetGame,
+    // Game moves logic
+    addMove,
+    // Winning Logic
+    checkWinner,
+    draw;
 
 // Setup game depending on Player's symbol choice
 document.getElementById('playerO').onclick = playerPlaysO;
@@ -46,27 +55,27 @@ playerMove.addEventListener('click', function(event) {
 });
 
 // Start with a fresh board, count and URL parameter.
-function startGame() {
+startGame = function() {
     for (var i = 0; i < gameFields.length; i++) {
         gameFields[i].classList.remove('O', 'X');
         gameFields[i].innerHTML = '';
     }
     moves = 0;
     urlParameters = ['-', '-', '-', '-', '-', '-', '-', '-', '-'];
-}
+};
 
 // Additional resets to prevent input if modals are dismissed.
-function resetGame() {
+resetGame = function() {
     playerSymbol = '';
     computerSymbol = '';
-}
+};
 
 // Winning logic.
-function checkWinner(symbol) {
+checkWinner = function(symbol) {
     if (
-        ($('#0').hasClass(symbol) &&
-            $('#1').hasClass(symbol) &&
-            $('#2').hasClass(symbol)) ||
+        (document.getElementById('0').classList.contains(symbol) &&
+            document.getElementById('1').classList.contains(symbol) &&
+            document.getElementById('2').classList.contains(symbol)) ||
         ($('#3').hasClass(symbol) &&
             $('#4').hasClass(symbol) &&
             $('#5').hasClass(symbol)) ||
@@ -109,7 +118,6 @@ function checkWinner(symbol) {
             );
             resetGame();
         }
-
         if (symbol === computerSymbol) {
             swal({
                 title: 'Oh no... The computer won...',
@@ -131,10 +139,10 @@ function checkWinner(symbol) {
             resetGame();
         }
     }
-}
+};
 
 // Check for a draw.
-function draw() {
+draw = function() {
     if (moves === 9) {
         setTimeout(
             function() {
@@ -160,10 +168,10 @@ function draw() {
             200
         );
     }
-}
+};
 
 // Game logic.
-function addMove(id) {
+addMove = function(id) {
     // Make sure the Player has chosen a symbol.
     if (!playerSymbol) {
         return swal({
@@ -252,4 +260,4 @@ function addMove(id) {
             );
         });
     }
-}
+};

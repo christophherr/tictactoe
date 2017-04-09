@@ -1,24 +1,30 @@
+// Globals to stop ESLint nags...
 /* global $, swal, axios*/
+
 // Uses Stujo's Tic Tac Toe API for Computer moves.
 // https://github.com/stujo/tictactoe-api
 
 'use strict';
 
+// All variables.
 // Symbol the player plays.
 var playerSymbol = '',
     // Symbol the computer plays.
     computerSymbol = '',
-    // Outputs the API response to the board.
+    // Output the API response to the board.
     computerMoveField,
     // Create the ID for outputting the Computer move.
     computerMove,
-    // Player plays 'O'
+    // Start buttons.
+    chooseO = document.getElementById('playerO'),
+    chooseX = document.getElementById('playerX'),
+    // Player plays 'O'.
     playerPlaysO = function() {
         playerSymbol = 'O';
         computerSymbol = 'X';
         startGame();
     },
-    // Player plays 'X'
+    // Player plays 'X'.
     playerPlaysX = function() {
         playerSymbol = 'X';
         computerSymbol = 'O';
@@ -28,23 +34,25 @@ var playerSymbol = '',
     urlParameters = ['-', '-', '-', '-', '-', '-', '-', '-', '-'],
     // URL parameter for API request.
     strippedUrlParameters,
-    // Api Url
+    // API Url.
     tictactoeapiUrl,
     // Keep track of moves.
     moves = 0,
-    // Selection of Game fields
+    // Selection of Game fields.
     gameFields = document.getElementsByClassName('tic-tac-toe-field'),
-    // Clicked Game fields
+    // Clicked Game fields.
     playerMove = document.getElementById('tic-tac-toe-board'),
-    // Game helpers
+    // Get HTML element from player's click.
+    playedField,
+    // Game helpers.
     startGame,
     resetGame,
-    // Game moves logic
+    // Game moves logic.
     addMove,
-    // Winning Logic
+    // Winning Logic.
     checkWinner,
     draw,
-    // input fields for checkWinner
+    // Input fields for checkWinner.
     field0 = document.getElementById('0'),
     field1 = document.getElementById('1'),
     field2 = document.getElementById('2'),
@@ -55,10 +63,9 @@ var playerSymbol = '',
     field7 = document.getElementById('7'),
     field8 = document.getElementById('8');
 
-// Setup game depending on Player's symbol choice
-document.getElementById('playerO').onclick = playerPlaysO;
-
-document.getElementById('playerX').onclick = playerPlaysX;
+// Setup game according to Player's symbol choice.
+chooseO.onclick = playerPlaysO;
+chooseX.onclick = playerPlaysX;
 
 playerMove.addEventListener('click', function(event) {
     addMove(event.target.id);
@@ -203,11 +210,11 @@ addMove = function(id) {
     }
 
     // Select HTML element from click event.
-    var selectField = document.getElementById(id);
+    playedField = document.getElementById(id);
 
     // Make sure the field is empty,
     // prevent accidentally clicking the same field twice.
-    if (selectField.innerHTML.length > 0) {
+    if (playedField.innerHTML.length > 0) {
         return swal(
             'This field has already been played.',
             'Please select a different field.',
@@ -216,8 +223,8 @@ addMove = function(id) {
     }
 
     // Output Player's turn and class on the board.
-    selectField.classList.add(playerSymbol);
-    selectField.innerHTML = playerSymbol;
+    playedField.classList.add(playerSymbol);
+    playedField.innerHTML = playerSymbol;
 
     // Check if Player has won.
     setTimeout(
@@ -233,10 +240,10 @@ addMove = function(id) {
     // Check if it´s a draw.
     draw();
 
-    // Player's move is recorded in the URL parameter.
+    // Record player's move in the URL parameter.
     urlParameters[id] = playerSymbol;
 
-    // URL parameter is prepared for API call
+    // Prepare URL parameter for API call.
     strippedUrlParameters = urlParameters.toString().replace(/,/g, '');
 
     // Create the URL for API call.
@@ -245,9 +252,9 @@ addMove = function(id) {
         '/' +
         computerSymbol;
 
+    // Prevent API call after a draw.
     if (moves < 9) {
         // Make the API call and turn the response into the Computer move.
-        // $.getJSON(tictactoeapiUrl, function(data) {
         axios.get(tictactoeapiUrl).then(function(response) {
             // Retrieve Computer move.
             computerMoveField = response.data.recommendation;
@@ -270,4 +277,6 @@ addMove = function(id) {
             );
         });
     }
+    // Stops ESLint nag...
+    return id;
 };
